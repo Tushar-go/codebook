@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { loginService } from "../services/Auth";
 
 
 
@@ -13,31 +12,8 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(localStorageUser?.user);
   const [loader, setLoader] = useState(false);
 
-  const loginUser = async (email, password) => {
-    if (email && password !== "") {
-      try {
-        const {
-          data: { foundUser, encodedToken },
-          status,
-        } = await loginService(email, password);
-
-        if (status === 200 || status === 201 ) {
-          localStorage.setItem(
-            "login",
-            JSON.stringify({ token: encodedToken })
-          );
-          setToken(encodedToken);
-          localStorage.setItem("user", JSON.stringify({ user: foundUser }));
-          setUser(foundUser);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-
+  
  
-
   useEffect(() => {
     setLoader(true);
     setTimeout(() => {
@@ -46,13 +22,27 @@ const AuthProvider = ({ children }) => {
     
   }, [token]);
 
+  useEffect(() => {
+    // Check if there's a token in localStorage
+    const storedToken = localStorage.getItem("signup");
+    const storedUser = localStorage.getItem("user");
+    
+    if (storedToken && storedUser) {
+      const parsedToken = JSON.parse(storedToken).token;
+      const parsedUser = JSON.parse(storedUser).user;
+      
+      // Set token and user in state
+      setToken(parsedToken);
+      setUser(parsedUser);
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
         token,
         setToken,
         user,
-        loginUser,
         setUser,
         loader,
         setLoader,
