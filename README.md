@@ -6,7 +6,6 @@
 </div>
 
 
-```
 ## **Features -**
 
 - Home page
